@@ -1,0 +1,27 @@
+name: Temporary remaining hardening
+
+on:
+  push:
+    paths:
+      - tools/apply_remaining_hardening.py
+      - .github/workflows/temp-remaining-hardening.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply source migration
+        run: python tools/apply_remaining_hardening.py
+      - name: Commit source changes and remove temporary files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -f tools/apply_remaining_hardening.py .github/workflows/temp-remaining-hardening.yml
+          git add -A
+          git commit -m "fix: complete remaining registration hardening"
+          git push
